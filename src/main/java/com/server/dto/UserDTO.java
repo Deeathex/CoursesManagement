@@ -2,20 +2,16 @@ package com.server.dto;
 
 import com.server.model.enums.Role;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
-@Getter
-public class User {
+@Data
+public class UserDTO {
     private String name;
     private String surname;
     private String email;
     private byte[] picture;
-    private Set<Role> roles;
+    private Role role;
 }

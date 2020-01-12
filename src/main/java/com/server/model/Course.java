@@ -1,30 +1,33 @@
 package com.server.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
-@Getter
-@Setter
+@Data
 
 @Entity
 @Table(name = "courses")
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "course_id")
     private Long id;
 
-    @Column(name = "title", nullable = false)
+    @Column
     private String title;
 
-    @Column(name = "description")
+    @Column
     private String description;
 
-    @Column(name = "year")
+    @Column
     private String year;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "lecture_id")
-    private Lecture lecture;
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    private Collection<Lecture> lectures = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "courses")
+    private Collection<User> users = new ArrayList<>();
 }

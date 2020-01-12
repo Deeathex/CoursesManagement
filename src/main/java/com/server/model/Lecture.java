@@ -1,41 +1,35 @@
 package com.server.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.sql.Blob;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
 
-@Getter
-@Setter
+@Data
 
 @Entity
 @Table(name = "lectures")
 public class Lecture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "lecture_id")
     private Long id;
 
-    @Column(name = "title")
+    @Column
     private String title;
 
-    @Column(name = "filename")
+    @Column
     private String filename;
 
-    @Column(name = "attachment")
+    @Column(columnDefinition = "mediumblob")
     @Lob
     private Blob attachment;
 
-    @Column(name = "date")
+    @Column
     private Date date;
 
-    @OneToMany(mappedBy = "lectures", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<User> professors = new ArrayList<>();
-
-    @OneToMany(mappedBy = "lectures", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Course> courses = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
 }
