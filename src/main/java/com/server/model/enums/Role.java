@@ -3,7 +3,8 @@ package com.server.model.enums;
 
 public enum Role {
     PROFESSOR,
-    STUDENT;
+    STUDENT,
+    NOT_SUPPORTED;
 
     private static final String ROLE_PREFIX = "ROLE_";
 

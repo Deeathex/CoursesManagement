@@ -1,5 +1,6 @@
 package com.server.model;
 
+import com.server.model.enums.Role;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -33,9 +34,8 @@ public class User {
     @Lob
     private Blob picture;
 
-    @ManyToOne
-    @JoinColumn(name = "user_role_id", nullable = false)
-    UserRole userRole;
+    @Column
+    private Role role;
 
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
