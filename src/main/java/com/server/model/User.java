@@ -30,9 +30,9 @@ public class User {
     @Column
     private String surname;
 
-    @Column(columnDefinition = "mediumblob")
     @Lob
-    private Blob picture;
+    @Column(columnDefinition = "mediumblob")
+    private byte[] picture;
 
     @Column
     private Role role;

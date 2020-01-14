@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
 
+@SuppressWarnings("Duplicates")
 @NoArgsConstructor
 public class UserMapper {
 
@@ -16,6 +17,9 @@ public class UserMapper {
         user.setName(userDTO.getName());
         user.setSurname(userDTO.getSurname());
         user.setEmail(userDTO.getEmail());
+        user.setPassword(userDTO.getPassword());
+        user.setRole(userDTO.getRole());
+        user.setPicture(userDTO.getPicture());
         return user;
     }
 
@@ -24,12 +28,16 @@ public class UserMapper {
         userDTO.setName(user.getName());
         userDTO.setSurname(user.getSurname());
         userDTO.setEmail(user.getEmail());
+        userDTO.setPassword(user.getPassword());
+        userDTO.setRole(user.getRole());
+        userDTO.setPicture(user.getPicture());
         return userDTO;
     }
 
-    public JSONObject getJsonMessage(HttpSession session, User user) {
+    public String getJsonMessageAsString(HttpSession session, User user) {
         return new JSONObject()
                 .put("session_id", session.getId())
-                .put("user", user);
+                .put("user", user)
+                .toString();
     }
 }

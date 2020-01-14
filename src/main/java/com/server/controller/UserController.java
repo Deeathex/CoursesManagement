@@ -4,6 +4,7 @@ import com.server.dto.UserDTO;
 import com.server.dto.mapper.UserMapper;
 import com.server.model.User;
 import com.server.service.UserService;
+import com.server.utils.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -18,7 +19,6 @@ import javax.servlet.http.HttpSession;
 @RequestMapping(value = "user")
 public class UserController {
     private static final Logger LOG = LogManager.getLogger(UserController.class.getName());
-    private static final String SESSION_ATTRIBUTE = "email";
 
     private final UserService userService;
     private UserMapper userMapper;
@@ -29,6 +29,19 @@ public class UserController {
         this.userMapper = new UserMapper();
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody UserDTO userDTO) {
+        User user = userMapper.userDTOToUser(userDTO);
+        boolean registered = userService.register(user);
+
+        if (!registered) {
+            JSONObject json = new JSONObject().put("message", "Email already registered or incorrect");
+            return new ResponseEntity<>(json, HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @RequestParam("email") String email,
@@ -37,43 +50,30 @@ public class UserController {
 
         User userDB = userService.getByEmail(email);
 
-        if (userDB != null && password.equalsIgnoreCase(userDB.getPassword())) {
-            session.setAttribute(SESSION_ATTRIBUTE, email);
-            JSONObject json = userMapper.getJsonMessage(session, userDB);
-            LOG.debug("Sending json to frontend: {} ", json);
-
-            return new ResponseEntity<>(json, HttpStatus.OK);
+        if (userDB == null || !password.equalsIgnoreCase(userDB.getPassword())) {
+            String json = new JSONObject().put("message", "Incorrect email or password").toString();
+            return new ResponseEntity<>(json, HttpStatus.UNAUTHORIZED);
         }
 
-        JSONObject json = new JSONObject().put("message", "Incorrect email or password");
-        return new ResponseEntity<>(json, HttpStatus.FORBIDDEN);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserDTO userDTO, HttpSession session) {
-        if (userService.getByEmail(userDTO.getEmail()) != null) {
-            JSONObject json = new JSONObject().put("message", "Email already registered");
-            return new ResponseEntity<>(json, HttpStatus.FORBIDDEN);
-        }
-
-        User user = userMapper.userDTOToUser(userDTO);
-        session.setAttribute(SESSION_ATTRIBUTE, user.getEmail());
-        user.setRole(userService.getRoleByEmail(user.getEmail()));
-        //persist in DB
-
-        JSONObject json = userMapper.getJsonMessage(session, user);
-        System.out.println(json);
+        session.setAttribute(Utils.SESSION_ATTRIBUTE, email);
+        String json = userMapper.getJsonMessageAsString(session, userDB);
+        LOG.debug("Sending json to frontend: {} ", json);
         return new ResponseEntity<>(json, HttpStatus.OK);
     }
 
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session) {
         session.removeAttribute("email");
+        session.invalidate();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<?> getAllUser() {
-        return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+    public ResponseEntity<?> getAllUser(HttpSession session) {
+        if (Utils.isValid(session)) {
+            return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 }
