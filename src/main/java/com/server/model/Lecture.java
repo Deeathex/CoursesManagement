@@ -22,9 +22,9 @@ public class Lecture {
     @Column
     private String filename;
 
-    @Column(columnDefinition = "mediumblob")
     @Lob
-    private Blob attachment;
+    @Column(columnDefinition = "mediumblob")
+    private byte[] attachment;
 
     @Column
     private Date date;

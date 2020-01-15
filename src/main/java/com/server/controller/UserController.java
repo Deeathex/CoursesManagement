@@ -3,6 +3,7 @@ package com.server.controller;
 import com.server.dto.UserDTO;
 import com.server.dto.mapper.UserMapper;
 import com.server.model.User;
+import com.server.model.enums.Role;
 import com.server.service.UserService;
 import com.server.utils.Utils;
 import org.apache.logging.log4j.LogManager;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 
 @RestController
-@RequestMapping(value = "user")
+@RequestMapping(value = "users-management")
 public class UserController {
     private static final Logger LOG = LogManager.getLogger(UserController.class.getName());
 
@@ -68,10 +69,19 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/getAll")
-    public ResponseEntity<?> getAllUser(HttpSession session) {
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers(HttpSession session) {
         if (Utils.isValid(session)) {
             return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping("/users/{role}")
+    public ResponseEntity<?> getAllUsersByRole(@PathVariable("role") Role role, HttpSession session) {
+        if (Utils.isValid(session)) {
+            return new ResponseEntity<>(userService.getAllBy(role), HttpStatus.OK);
         }
 
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);

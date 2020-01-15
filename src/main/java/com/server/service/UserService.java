@@ -7,24 +7,25 @@ import com.server.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository repository;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserService(UserRepository repository) {
+        this.repository = repository;
     }
 
     public List<User> getAll() {
-        return userRepository.findAll();
+        return repository.findAll();
     }
 
     public User getByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+        return repository.findByEmail(email).orElse(null);
     }
 
     public boolean register(User user) {
@@ -38,7 +39,11 @@ public class UserService {
         }
 
         user.setRole(role);
-        userRepository.save(user);
+        repository.save(user);
         return true;
+    }
+
+    public List<User> getAllBy(Role role) {
+        return (List<User>) repository.findAllByRole(role).orElse(new ArrayList<>());
     }
 }
