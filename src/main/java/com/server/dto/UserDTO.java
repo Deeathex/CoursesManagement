@@ -1,14 +1,15 @@
 package com.server.dto;
 
 import com.server.model.enums.Role;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.io.Serializable;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class UserDTO {
+public class UserDTO implements Serializable {
+    private Long id;
     private String name;
     private String surname;
     private String email;

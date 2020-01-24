@@ -1,20 +1,27 @@
 package com.server.controller;
 
+import com.server.dto.AccountDTO;
 import com.server.dto.UserDTO;
 import com.server.dto.mapper.UserMapper;
 import com.server.model.User;
 import com.server.model.enums.Role;
 import com.server.service.UserService;
 import com.server.utils.Utils;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "users-management")
@@ -22,7 +29,7 @@ public class UserController {
     private static final Logger LOG = LogManager.getLogger(UserController.class.getName());
 
     private final UserService userService;
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     @Autowired
     public UserController(UserService userService) {
@@ -36,11 +43,10 @@ public class UserController {
         boolean registered = userService.register(user);
 
         if (!registered) {
-            JSONObject json = new JSONObject().put("message", "Email already registered or incorrect");
-            return new ResponseEntity<>(json, HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(Utils.getErrorMessage("Email already registered or incorrect"), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(userMapper.userToUserDTO(user), HttpStatus.OK);
     }
 
     @PostMapping("/login")
@@ -49,15 +55,12 @@ public class UserController {
             @RequestParam("password") String password,
             HttpSession session) {
 
-        User userDB = userService.getByEmail(email);
-
-        if (userDB == null || !password.equalsIgnoreCase(userDB.getPassword())) {
-            String json = new JSONObject().put("message", "Incorrect email or password").toString();
-            return new ResponseEntity<>(json, HttpStatus.UNAUTHORIZED);
+        if (!userService.valid(email, password)) {
+            return new ResponseEntity<>(Utils.getErrorMessage("Incorrect email or password"), HttpStatus.UNAUTHORIZED);
         }
 
-        session.setAttribute(Utils.SESSION_ATTRIBUTE, email);
-        String json = userMapper.getJsonMessageAsString(session, userDB);
+        session.setAttribute(Utils.EMAIL_SESSION_ATTRIBUTE, email);
+        String json = userMapper.getJsonMessageAsString(session, userMapper.userToUserDTO(userService.getByEmail(email)));
         LOG.debug("Sending json to frontend: {} ", json);
         return new ResponseEntity<>(json, HttpStatus.OK);
     }
@@ -71,19 +74,64 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(HttpSession session) {
-        if (Utils.isValid(session)) {
-            return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+        if (!Utils.isValid(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(userMapper.usersToUsersDTO(userService.getAll()), HttpStatus.OK);
     }
 
     @GetMapping("/users/{role}")
     public ResponseEntity<?> getAllUsersByRole(@PathVariable("role") Role role, HttpSession session) {
-        if (Utils.isValid(session)) {
-            return new ResponseEntity<>(userService.getAllBy(role), HttpStatus.OK);
+        if (!Utils.isValid(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(userMapper.usersToUsersDTO(userService.getAllBy(role)), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/save-account-settings/")
+    public ResponseEntity<?> saveAccountSettings(
+            @ModelAttribute AccountDTO accountDTO,
+            @RequestParam("file") MultipartFile file,
+            HttpSession session) {
+
+        if (!Utils.isValid(session)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        User user = userService.getUserFromSession(session);
+
+        if (checkAccountDTO(accountDTO)
+                && (!userService.valid(user.getEmail(), accountDTO.getPassword())
+                || !accountDTO.getNewPassword().equals(accountDTO.getRewrittenPassword()))) {
+            LOG.info("Passwords do not match.");
+            return new ResponseEntity<>(Utils.getErrorMessage("Passwords do not match."), HttpStatus.BAD_REQUEST);
+        }
+
+        User newUser = userMapper.accountDTOToUser(accountDTO);
+        newUser.setEmail(user.getEmail());
+        try {
+            newUser.setPicture(file.getBytes());
+        } catch (IOException e) {
+            LOG.info("Could not process avatar.");
+            e.printStackTrace();
+        }
+
+        userService.saveAccountSettings(newUser);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private boolean checkAccountDTO(AccountDTO accountDTO) {
+        if (accountDTO.getPassword() == null) {
+            return false;
+        }
+
+        if (accountDTO.getNewPassword() == null) {
+            return false;
+        }
+
+        return accountDTO.getRewrittenPassword() != null;
     }
 }

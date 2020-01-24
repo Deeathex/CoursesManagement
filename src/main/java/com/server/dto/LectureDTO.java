@@ -1,16 +1,16 @@
 package com.server.dto;
 
 import com.server.model.Course;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class LectureDTO {
+public class LectureDTO implements Serializable {
+    private Long id;
     private String title;
     private String filename;
     private byte[] attachment;

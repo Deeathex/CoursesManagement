@@ -2,6 +2,8 @@ package com.server.service;
 
 import com.server.model.Course;
 import com.server.model.Lecture;
+import com.server.model.enums.Role;
+import com.server.repository.CourseRepository;
 import com.server.repository.LectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,25 +11,44 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 public class LectureService {
 
-    private final LectureRepository repository;
+    private final LectureRepository lectureRepository;
+
+    private final CourseRepository courseRepository;
 
     @Autowired
-    public LectureService(LectureRepository repository) {
-        this.repository = repository;
+    public LectureService(LectureRepository lectureRepository, CourseRepository courseRepository) {
+        this.lectureRepository = lectureRepository;
+        this.courseRepository = courseRepository;
     }
 
     public List<Lecture> getAllBy(Course course) {
-        return (List<Lecture>) repository.findAllByCourse(course).orElse(new ArrayList<>());
+        return (List<Lecture>) lectureRepository.findAllByCourse(course).orElse(new ArrayList<>());
     }
 
-    public List<Lecture> getAllByCourseSortedByDate(Course course) {
-        List<Lecture> lectures = getAllBy(course);
-        lectures.sort(Comparator.comparing(Lecture::getDate));
-        return lectures;
+    /***
+     * This method gets all the lectures that correspond to the given course, by also
+     * checking the user's permissions to see the lectures.
+     * @param userId the id of the user that is requesting the lectures
+     * @param courseId the id of the course for which to look for the lectures
+     * @return the list with all the lectures (sorted by date) corresponding to userId, courseId
+     */
+    public List<Lecture> getAllByCourseSortedByDate(Long userId, Long courseId) {
+        Course course = courseRepository.getOne(courseId);
+        if (course.getUsers().stream().noneMatch(u -> u.getId().equals(userId))) {
+            throw new RuntimeException("User not enrolled to the course!");
+        }
+
+        return getAllBy(course)
+                .stream()
+                .sorted(Comparator.comparing(Lecture::getDate))
+                .collect(Collectors.toList());
+
     }
 
     /***
@@ -36,10 +57,10 @@ public class LectureService {
      * @param lecture is the entity for which to be looking for in DB
      */
     public Lecture save(Lecture lecture) {
-        return repository.save(lecture);
+        return lectureRepository.save(lecture);
     }
 
     public void delete(Lecture lecture) {
-        repository.delete(lecture);
+        lectureRepository.delete(lecture);
     }
 }

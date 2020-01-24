@@ -25,6 +25,9 @@ public class Course {
     @Column
     private String year;
 
+    @Column
+    private Long maxStudents;
+
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     private Collection<Lecture> lectures = new ArrayList<>();
 

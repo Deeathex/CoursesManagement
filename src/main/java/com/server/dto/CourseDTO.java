@@ -2,20 +2,21 @@ package com.server.dto;
 
 import com.server.model.Lecture;
 import com.server.model.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class CourseDTO {
+public class CourseDTO implements Serializable {
+    private Long id;
     private String title;
     private String description;
     private String year;
-    private Collection<Lecture> lectures = new ArrayList<>();
-    private Collection<User> users = new ArrayList<>();
+    private Long maxStudents;
+    private Collection<LectureDTO> lectures = new ArrayList<>();
+    private Collection<UserDTO> users = new ArrayList<>();
 }

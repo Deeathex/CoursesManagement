@@ -82,7 +82,8 @@ public class UserServiceTest {
     }
 
     private void setUpUserToSave() {
-        studentToSave.setEmail("studentToSave@scs.ubbcluj.ro");
+        studentToSave.setEmail("casd1924@scs.ubbcluj.ro");
+        studentToSave.setPassword("password");
     }
 
     private List<User> mockRepository() {
