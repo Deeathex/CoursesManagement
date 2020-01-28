@@ -2,6 +2,7 @@ package com.server.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.server.dto.AccountDTO;
+import com.server.dto.CredentialsDTO;
 import com.server.dto.UserDTO;
 import com.server.dto.mapper.UserMapper;
 import com.server.model.User;
@@ -47,10 +48,12 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @RequestBody Map<String, Object> credentials,
+            @RequestBody CredentialsDTO credentialsDTO,
             HttpSession session) {
-        String email = (String) credentials.get("email");
-        String password = (String) credentials.get("password");
+
+        String email = credentialsDTO.getEmail();
+        String password = credentialsDTO.getPassword();
+
         if (userService.isNotValid(email, password)) {
             return new ResponseEntity<>(Utils.getErrorMessage("Incorrect email or password"), HttpStatus.UNAUTHORIZED);
         }

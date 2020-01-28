@@ -3,8 +3,7 @@ package com.server.model;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.sql.Blob;
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Data
 
@@ -27,7 +26,7 @@ public class Lecture {
     private byte[] attachment;
 
     @Column
-    private Date date;
+    private LocalDate date;
 
     @ManyToOne
     @JoinColumn(name = "course_id")

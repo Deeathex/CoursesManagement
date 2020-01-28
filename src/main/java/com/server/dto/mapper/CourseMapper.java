@@ -7,7 +7,6 @@ import com.server.model.Course;
 import com.server.model.Lecture;
 import com.server.model.User;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class CourseMapper {
             Lecture lecture = new Lecture();
             lecture.setId(lectureDTO.getId());
             lecture.setTitle(lectureDTO.getTitle());
-            lecture.setDate((Date) lectureDTO.getDate());
+            lecture.setDate(lectureDTO.getDate());
             lecture.setFilename(lectureDTO.getFilename());
             lecture.setAttachment(lectureDTO.getAttachment());
             lectures.add(lecture);

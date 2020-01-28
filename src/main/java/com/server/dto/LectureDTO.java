@@ -1,10 +1,11 @@
 package com.server.dto;
 
-import com.server.model.Course;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,6 +15,5 @@ public class LectureDTO implements Serializable {
     private String title;
     private String filename;
     private byte[] attachment;
-    private Date date;
-    private Course course;
+    private LocalDate date;
 }

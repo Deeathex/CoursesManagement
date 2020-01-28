@@ -1,6 +1,7 @@
 package com.server.controller;
 
 import com.server.dto.CourseDTO;
+import com.server.dto.NewsDTO;
 import com.server.dto.mapper.CourseMapper;
 import com.server.dto.mapper.UserMapper;
 import com.server.model.Course;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -175,8 +177,7 @@ public class CourseController {
 
     @PostMapping("/courses/email")
     public ResponseEntity<?> sendNewsToStudents(
-            @RequestParam Long courseId,
-            @RequestParam String message,
+            @RequestBody NewsDTO newsDTO,
             HttpSession session) {
 
         if (Utils.isNotValid(session)) {
@@ -184,13 +185,13 @@ public class CourseController {
         }
 
         try {
-            List<User> studentsToBeNotified = courseService.getStudentsFromCourse(courseId, userService.getUserFromSession(session));
-            emailService.sendEmail(message, studentsToBeNotified);
+            List<User> studentsToBeNotified = courseService.getStudentsFromCourse(newsDTO.getCourseId(), userService.getUserFromSession(session));
+            emailService.sendEmail(newsDTO.getNewsMessage(), studentsToBeNotified);
         } catch (Exception e) {
             return new ResponseEntity<>(Utils.getErrorMessage("Incorrect course."), HttpStatus.BAD_REQUEST);
         }
 
-        LOG.info("Professor notifies students enrolled to course with id: {}", courseId);
+        LOG.info("Professor notifies students enrolled to course with id: {}", newsDTO.getCourseId());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

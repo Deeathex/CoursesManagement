@@ -1,6 +1,7 @@
 package com.server.controller;
 
 import com.server.dto.LectureDTO;
+import com.server.dto.LectureDTOWrapper;
 import com.server.dto.mapper.LectureMapper;
 import com.server.model.Lecture;
 import com.server.model.User;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -38,6 +40,7 @@ public class LectureController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
+        LOG.info("User requests all lectures from course: {}", courseId);
         User user = userService.getUserFromSession(session);
 
         List<Lecture> lectures;
@@ -47,7 +50,7 @@ public class LectureController {
             return new ResponseEntity<>(Utils.getErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
-        LOG.info("User requests all lectures from course: {}", courseId);
+
         return new ResponseEntity<>(LectureMapper.lecturesToLecturesDTO(lectures), HttpStatus.OK);
     }
 
@@ -63,15 +66,15 @@ public class LectureController {
 
     @PostMapping("/lectures")
     public ResponseEntity<?> addOrEditLectureToCourse(
-            @RequestBody LectureDTO lectureDTO,
-            @RequestParam Long courseId,
+            @RequestBody LectureDTOWrapper lectureDTOWrapper,
             HttpSession session) {
 
         if (Utils.isNotValid(session)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        Lecture lecture = LectureMapper.lectureDTOTOLecture(lectureDTO);
+        Lecture lecture = LectureMapper.lectureDTOTOLecture(lectureDTOWrapper.getLectureDTO());
+        Long courseId = lectureDTOWrapper.getCourseId();
 
         try {
             lectureService.save(lecture, courseId, userService.getUserFromSession(session));

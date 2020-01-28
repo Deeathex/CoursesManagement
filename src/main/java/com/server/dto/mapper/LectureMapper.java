@@ -1,11 +1,8 @@
 package com.server.dto.mapper;
 
 import com.server.dto.LectureDTO;
-import com.server.dto.UserDTO;
 import com.server.model.Lecture;
-import com.server.model.User;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +13,7 @@ public class LectureMapper {
 
         lecture.setId(lectureDTO.getId());
         lecture.setTitle(lectureDTO.getTitle());
-        lecture.setCourse(lectureDTO.getCourse());
-        lecture.setDate((Date) lectureDTO.getDate());
+        lecture.setDate(lectureDTO.getDate());
         lecture.setFilename(lectureDTO.getFilename());
         lecture.setAttachment(lectureDTO.getAttachment());
 
@@ -29,7 +25,6 @@ public class LectureMapper {
 
         lectureDTO.setId(lecture.getId());
         lectureDTO.setTitle(lecture.getTitle());
-        lectureDTO.setCourse(lecture.getCourse());
         lectureDTO.setDate(lecture.getDate());
         lectureDTO.setFilename(lecture.getFilename());
         lectureDTO.setAttachment(lecture.getAttachment());
