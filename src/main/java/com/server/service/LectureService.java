@@ -2,9 +2,12 @@ package com.server.service;
 
 import com.server.model.Course;
 import com.server.model.Lecture;
+import com.server.model.User;
 import com.server.model.enums.Role;
 import com.server.repository.CourseRepository;
 import com.server.repository.LectureRepository;
+import com.server.repository.UserRepository;
+import com.server.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +24,13 @@ public class LectureService {
 
     private final CourseRepository courseRepository;
 
+    private final UserRepository userRepository;
+
     @Autowired
-    public LectureService(LectureRepository lectureRepository, CourseRepository courseRepository) {
+    public LectureService(LectureRepository lectureRepository, CourseRepository courseRepository, UserRepository userRepository) {
         this.lectureRepository = lectureRepository;
         this.courseRepository = courseRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Lecture> getAllBy(Course course) {
@@ -55,12 +61,42 @@ public class LectureService {
      * This method will persist the new lecture into DB if the provided lecture does not exists,
      * or will update the existing one if the lecture already exists in DB.
      * @param lecture is the entity for which to be looking for in DB
+     * @param courseId is the course within adding the new lecture
+     * @param user is the user that wants to perform the save (only professors are allowed to do that)
      */
-    public Lecture save(Lecture lecture) {
+    public Lecture save(Lecture lecture, Long courseId, User user) {
+        if (!user.getRole().equals(Role.PROFESSOR)) {
+            throw new RuntimeException("Not authorized.");
+        }
+
+        Course course = courseRepository.getOne(courseId);
+        lecture.setCourse(course);
+
         return lectureRepository.save(lecture);
     }
 
-    public void delete(Lecture lecture) {
-        lectureRepository.delete(lecture);
+    public boolean delete(Long lectureId, User user) {
+        if (!user.getRole().equals(Role.PROFESSOR)) {
+            return false;
+        }
+
+        try {
+            courseRepository.deleteById(lectureId);
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        return true;
+    }
+
+    public List<Lecture> filterBy(String filter) {
+        Predicate<Lecture> mainPredicate = x -> false;
+        mainPredicate = mainPredicate
+                .or(x -> x.getTitle().contains(filter))
+                .or(x -> x.getDate().toString().contains(filter));
+
+        return lectureRepository.findAll()
+                .stream()
+                .filter(mainPredicate)
+                .collect(Collectors.toList());
     }
 }

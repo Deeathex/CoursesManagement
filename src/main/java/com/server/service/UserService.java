@@ -1,6 +1,5 @@
 package com.server.service;
 
-import com.server.controller.UserController;
 import com.server.model.User;
 import com.server.model.enums.Role;
 import com.server.repository.UserRepository;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UserService {
@@ -58,7 +58,7 @@ public class UserService {
      */
     public User saveAccountSettings(User newUser) {
         User userDB = repository.findByEmail(newUser.getEmail()).orElse(null);
-        return repository.save(Utils.updateUser(userDB, newUser));
+        return repository.save(Objects.requireNonNull(Utils.updateUser(userDB, newUser)));
     }
 
     /***
@@ -69,9 +69,9 @@ public class UserService {
      * @return true if email is already registered and the supplied password correspond to the one from DB,
      * false otherwise
      */
-    public boolean valid(String email, String password) {
+    public boolean isNotValid(String email, String password) {
         User userDB = getByEmail(email);
-        return userDB != null && password.equalsIgnoreCase(userDB.getPassword());
+        return userDB == null || !password.equalsIgnoreCase(userDB.getPassword());
     }
 
     /***

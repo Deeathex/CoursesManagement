@@ -44,4 +44,6 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "course_id")}
     )
     Collection<Course> courses = new ArrayList<>();
+
+
 }

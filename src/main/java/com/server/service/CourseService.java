@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -48,14 +49,9 @@ public class CourseService {
     /***
      * This method will offer much more details about a course.
      * @param courseId the id of the course
-     * @param userId the user that requests the course
      * @return the course for the provided id
      */
-    public Course getCourseDetails(Long courseId, Long userId) {
-        if (checkForUserWithRole(userId, Role.PROFESSOR) == null) {
-            throw new RuntimeException("The provided user does not have permissions.");
-        }
-
+    public Course getCourseDetails(Long courseId) {
         return courseRepository.getOne(courseId);
     }
 
@@ -66,8 +62,8 @@ public class CourseService {
      * @param user is the user that wants to perform the save (only professors are allowed to do that)
      */
     public Course save(Course course, User user) {
-        if (checkForUserWithRole(user.getId(), Role.PROFESSOR) == null) {
-            throw new RuntimeException("The provided user does not have permissions.");
+        if (!user.getRole().equals(Role.PROFESSOR)) {
+            throw new RuntimeException("Not authorized.");
         }
 
         // the professor must be added too in the list of users within a course
@@ -77,8 +73,8 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public boolean delete(Long courseId, Long userId) {
-        if (checkForUserWithRole(userId, Role.PROFESSOR) == null) {
+    public boolean delete(Long courseId, User user) {
+        if (!user.getRole().equals(Role.PROFESSOR)) {
             return false;
         }
 
@@ -86,10 +82,9 @@ public class CourseService {
         return true;
     }
 
-    public boolean enrollStudent(Long courseId, Long userId) {
+    public boolean enrollStudent(Long courseId, User user) {
         try {
-            User user = checkForUserWithRole(userId, Role.STUDENT);
-            if (user == null) {
+            if (!user.getRole().equals(Role.STUDENT)) {
                 return false;
             }
             Course newCourse = courseRepository.getOne(courseId);
@@ -116,19 +111,9 @@ public class CourseService {
                 .collect(Collectors.toList());
     }
 
-    private User checkForUserWithRole(Long userId, Role role) {
-        User user = userRepository.getOne(userId);
-        if (user.getRole() == role) {
-            return user;
-        }
-
-        return null;
-    }
-
-    public int getNumberOfStudentsFromCourse(Long courseId, Long userId) {
-        User user = checkForUserWithRole(userId, Role.PROFESSOR);
-        if (user == null) {
-            throw new RuntimeException("Incorrect courseId or userId.");
+    public int getNumberOfStudentsFromCourse(Long courseId, User user) {
+        if (!user.getRole().equals(Role.PROFESSOR)) {
+            throw new RuntimeException("Not authorized.");
         }
 
         Course course = courseRepository.getOne(courseId);
@@ -141,5 +126,23 @@ public class CourseService {
         }
 
         return studentsCount;
+    }
+
+    public List<User> getStudentsFromCourse(Long courseId, User user) {
+        if (!user.getRole().equals(Role.PROFESSOR)) {
+            throw new RuntimeException("Not authorized.");
+        }
+
+        try {
+            return courseRepository.getOne(courseId)
+                    .getUsers()
+                    .stream()
+                    .filter(u -> u.getRole().equals(Role.STUDENT))
+                    .collect(Collectors.toList());
+        } catch (Exception ignored) {
+
+        }
+
+        return new ArrayList<>();
     }
 }

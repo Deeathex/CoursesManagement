@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class UserMapper {
 
-    public User userDTOToUser(UserDTO userDTO) {
+    public static User userDTOToUser(UserDTO userDTO) {
         User user = new User();
 
         user.setId(userDTO.getId());
@@ -29,7 +29,7 @@ public class UserMapper {
         return user;
     }
 
-    public UserDTO userToUserDTO(User user) {
+    public static UserDTO userToUserDTO(User user) {
         UserDTO userDTO = new UserDTO();
 
         userDTO.setId(user.getId());
@@ -43,7 +43,7 @@ public class UserMapper {
         return userDTO;
     }
 
-    public User accountDTOToUser(AccountDTO accountDTO) {
+    public static User accountDTOToUser(AccountDTO accountDTO) {
         User user = new User();
 
         user.setName(accountDTO.getName());
@@ -53,7 +53,7 @@ public class UserMapper {
         return user;
     }
 
-    public List<UserDTO> usersToUsersDTO(List<User> users) {
+    public static List<UserDTO> usersToUsersDTO(List<User> users) {
         List<UserDTO> usersDTO = new ArrayList<>();
 
         for (User user : users) {
@@ -63,7 +63,7 @@ public class UserMapper {
         return usersDTO;
     }
 
-    public List<User> usersDTOToUsers(List<UserDTO> usersDTO) {
+    public static List<User> usersDTOToUsers(List<UserDTO> usersDTO) {
         List<User> users = new ArrayList<>();
 
         for (UserDTO userDTO : usersDTO) {
@@ -73,7 +73,7 @@ public class UserMapper {
         return users;
     }
 
-    public String getJsonMessageAsString(HttpSession session, UserDTO userDTO) {
+    public static String getJsonMessageAsString(HttpSession session, UserDTO userDTO) {
         return new JSONObject()
                 .put("session_id", session.getId())
                 .put("user", userDTO)

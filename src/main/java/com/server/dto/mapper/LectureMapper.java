@@ -11,7 +11,7 @@ import java.util.List;
 
 public class LectureMapper {
 
-    public Lecture lectureDTOTOLecture(LectureDTO lectureDTO) {
+    public static Lecture lectureDTOTOLecture(LectureDTO lectureDTO) {
         Lecture lecture = new Lecture();
 
         lecture.setId(lectureDTO.getId());
@@ -24,7 +24,7 @@ public class LectureMapper {
         return lecture;
     }
 
-    public LectureDTO lectureToLectureDTO(Lecture lecture) {
+    public static LectureDTO lectureToLectureDTO(Lecture lecture) {
         LectureDTO lectureDTO = new LectureDTO();
 
         lectureDTO.setId(lecture.getId());
@@ -37,7 +37,7 @@ public class LectureMapper {
         return lectureDTO;
     }
 
-    public List<LectureDTO> lecturesToLecturesDTO(List<Lecture> lectures) {
+    public static List<LectureDTO> lecturesToLecturesDTO(List<Lecture> lectures) {
         List<LectureDTO> lecturesDTO = new ArrayList<>();
 
         for (Lecture user : lectures) {
@@ -47,7 +47,7 @@ public class LectureMapper {
         return lecturesDTO;
     }
 
-    public List<Lecture> lecturesDTOToLectures(List<LectureDTO> lecturesDTO) {
+    public static List<Lecture> lecturesDTOToLectures(List<LectureDTO> lecturesDTO) {
         List<Lecture> lectures = new ArrayList<>();
 
         for (LectureDTO userDTO : lecturesDTO) {

@@ -14,7 +14,7 @@ import java.util.List;
 @SuppressWarnings("Duplicates")
 public class CourseMapper {
 
-    public Course courseDTOToCourse(CourseDTO courseDTO) {
+    public static Course courseDTOToCourse(CourseDTO courseDTO) {
         Course course = new Course();
 
         course.setId(courseDTO.getId());
@@ -35,13 +35,12 @@ public class CourseMapper {
         }
         course.setLectures(lectures);
 
-        UserMapper userMapper = new UserMapper();
-        course.setUsers(userMapper.usersDTOToUsers((List<UserDTO>) courseDTO.getUsers()));
+        course.setUsers(UserMapper.usersDTOToUsers((List<UserDTO>) courseDTO.getUsers()));
 
         return course;
     }
 
-    public CourseDTO courseToCourseDTO(Course course) {
+    public static CourseDTO courseToCourseDTO(Course course) {
         CourseDTO courseDTO = new CourseDTO();
 
         courseDTO.setId(course.getId());
@@ -62,13 +61,12 @@ public class CourseMapper {
         }
         courseDTO.setLectures(lectureDTOS);
 
-        UserMapper userMapper = new UserMapper();
-        courseDTO.setUsers(userMapper.usersToUsersDTO((List<User>) course.getUsers()));
+        courseDTO.setUsers(UserMapper.usersToUsersDTO((List<User>) course.getUsers()));
 
         return courseDTO;
     }
 
-    public List<CourseDTO> coursesToCoursesDTO(List<Course> courses) {
+    public static List<CourseDTO> coursesToCoursesDTO(List<Course> courses) {
         List<CourseDTO> coursesDTO = new ArrayList<>();
 
         for (Course user : courses) {
@@ -78,7 +76,7 @@ public class CourseMapper {
         return coursesDTO;
     }
 
-    public List<Course> coursesDTOToCourses(List<CourseDTO> coursesDTO) {
+    public static List<Course> coursesDTOToCourses(List<CourseDTO> coursesDTO) {
         List<Course> courses = new ArrayList<>();
 
         for (CourseDTO userDTO : coursesDTO) {

@@ -40,4 +40,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload
     compile group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+
+    // https://mvnrepository.com/artifact/javax.mail/mail
+    compile group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
 }
