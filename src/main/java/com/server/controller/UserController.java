@@ -1,5 +1,6 @@
 package com.server.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.server.dto.AccountDTO;
 import com.server.dto.UserDTO;
 import com.server.dto.mapper.UserMapper;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "users-management")
@@ -45,16 +47,21 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @RequestParam("email") String email,
-            @RequestParam("password") String password,
+            @RequestBody Map<String, Object> credentials,
             HttpSession session) {
-
+        String email = (String) credentials.get("email");
+        String password = (String) credentials.get("password");
         if (userService.isNotValid(email, password)) {
             return new ResponseEntity<>(Utils.getErrorMessage("Incorrect email or password"), HttpStatus.UNAUTHORIZED);
         }
-
         session.setAttribute(Utils.EMAIL_SESSION_ATTRIBUTE, email);
-        String json = UserMapper.getJsonMessageAsString(session, UserMapper.userToUserDTO(userService.getByEmail(email)));
+
+        String json = null;
+        try {
+            json = UserMapper.getJsonMessageAsString(session, UserMapper.userToUserDTO(userService.getByEmail(email)));
+        } catch (JsonProcessingException e) {
+            LOG.error("Error while constructing the user: {}" + e.getMessage());
+        }
 
         LOG.info("User {} logged in.", email);
         return new ResponseEntity<>(json, HttpStatus.OK);
