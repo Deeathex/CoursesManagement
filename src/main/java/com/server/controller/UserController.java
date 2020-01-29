@@ -19,8 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Map;
 
+@CrossOrigin
 @RestController
 @RequestMapping(value = "users-management")
 public class UserController {

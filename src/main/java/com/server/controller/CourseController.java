@@ -17,9 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.text.ParseException;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping(value = "courses-management")
 public class CourseController {

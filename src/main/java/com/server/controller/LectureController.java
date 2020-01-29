@@ -1,6 +1,5 @@
 package com.server.controller;
 
-import com.server.dto.LectureDTO;
 import com.server.dto.LectureDTOWrapper;
 import com.server.dto.mapper.LectureMapper;
 import com.server.model.Lecture;
@@ -15,9 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.text.ParseException;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping(value = "lectures-management")
 public class LectureController {
