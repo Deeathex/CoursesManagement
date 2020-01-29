@@ -1,7 +1,10 @@
 package com.server.dto.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.server.dto.AccountDTO;
 import com.server.dto.UserDTO;
 import com.server.model.User;
@@ -75,11 +78,15 @@ public class UserMapper {
         return users;
     }
 
-    public static String getJsonMessageAsString(HttpSession session, UserDTO userDTO) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return new JSONObject()
-                .put("session_id", session.getId())
-                .put("user", objectMapper.writeValueAsString(userDTO))
-                .toString();
+    public static String getJsonMessageAsString(HttpSession session, UserDTO userDTO) {
+        JsonNodeFactory factory = new JsonNodeFactory(false);
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode login = factory.objectNode();
+        login.put("session_id", session.getId());
+
+        JsonNode node = mapper.valueToTree(userDTO);
+        login.set("user", node);
+
+        return login.toString();
     }
 }

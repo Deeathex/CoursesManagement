@@ -59,12 +59,7 @@ public class UserController {
         }
         session.setAttribute(Utils.EMAIL_SESSION_ATTRIBUTE, email);
 
-        String json = null;
-        try {
-            json = UserMapper.getJsonMessageAsString(session, UserMapper.userToUserDTO(userService.getByEmail(email)));
-        } catch (JsonProcessingException e) {
-            LOG.error("Error while constructing the user: {}" + e.getMessage());
-        }
+        String json = UserMapper.getJsonMessageAsString(session, UserMapper.userToUserDTO(userService.getByEmail(email)));
 
         LOG.info("User {} logged in.", email);
         return new ResponseEntity<>(json, HttpStatus.OK);
