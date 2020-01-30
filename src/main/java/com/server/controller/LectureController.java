@@ -53,13 +53,17 @@ public class LectureController {
         return new ResponseEntity<>(LectureMapper.lecturesToLecturesDTO(lectures), HttpStatus.OK);
     }
 
-    @GetMapping("/lectures/filter")
-    public ResponseEntity<?> filterLecturesBy(@RequestParam String filter, HttpSession session) {
+    @GetMapping("/lectures/filter/{course-id}")
+    public ResponseEntity<?> filterLecturesBy(
+            @RequestParam String filter,
+            @PathVariable("course-id") Long courseId,
+            HttpSession session) {
+
         if (Utils.isNotValid(session)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        return new ResponseEntity<>(LectureMapper.lecturesToLecturesDTO(lectureService.filterBy(filter)), HttpStatus.OK);
+        return new ResponseEntity<>(LectureMapper.lecturesToLecturesDTO(lectureService.filterBy(courseId, filter)), HttpStatus.OK);
     }
 
 

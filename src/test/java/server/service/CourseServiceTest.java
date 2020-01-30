@@ -5,12 +5,10 @@ import com.server.model.User;
 import com.server.repository.CourseRepository;
 import com.server.repository.UserRepository;
 import com.server.service.CourseService;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
@@ -20,7 +18,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 import static server.service.Utils.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -47,6 +46,7 @@ public class CourseServiceTest {
 
     @Before
     public void init() {
+        student = setUpStudent();
         courseService = new CourseService(courseRepository, userRepository);
 
         professor = setUpProfessor();
@@ -71,6 +71,8 @@ public class CourseServiceTest {
             inMemoryCourseRepository.remove(courseToSave);
             return null;
         }).when(courseRepository).deleteById(2L);
+
+        when(courseRepository.getOne(1L)).thenReturn(course);
     }
 
     @Test
@@ -97,11 +99,35 @@ public class CourseServiceTest {
 
     @Test
     public void deleteTest() {
-        student = setUpStudent();
         assertFalse(courseService.delete(1L, student));
 
         assertTrue(courseService.delete(courseToSave.getId(), professor));
         assertEquals(1, inMemoryCourseRepository.size());
     }
 
+    @Test
+    public void enrollStudentTest() {
+        assertFalse(courseService.enrollStudent(1L, professor));
+        assertTrue(courseService.enrollStudent(1L, student));
+    }
+
+    @Test
+    public void filterByTest() {
+        inMemoryCourseRepository.add(setUpCourseToSave());
+
+        List<Course> filteredCourses = courseService.filterBy("Flux");
+        assertEquals(1, filteredCourses.size());
+        assertEquals(inMemoryCourseRepository.get(0), filteredCourses.get(0));
+    }
+
+    @Test
+    public void getNumberOfStudentFromCourseTest() {
+        int numberOfStudentsFromCourse = courseService.getNumberOfStudentsFromCourse(1L, professor);
+        assertEquals(0, numberOfStudentsFromCourse);
+    }
+
+    @Test
+    public void getStudentsFromCourse() {
+        assertEquals(new ArrayList<>(), courseService.getStudentsFromCourse(1L, professor));
+    }
 }

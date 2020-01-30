@@ -94,10 +94,10 @@ public class CourseService {
     public List<Course> filterBy(String filter) {
         Predicate<Course> mainPredicate = x -> false;
         mainPredicate = mainPredicate
-                .or(x -> x.getDescription().contains(filter))
-                .or(x -> x.getTitle().contains(filter))
-                .or(x -> x.getYear().contains(filter))
-                .or(x -> x.getLectures().stream().anyMatch(y -> y.getTitle().contains(filter)));
+                .or(x -> x.getDescription() != null && x.getDescription().contains(filter))
+                .or(x -> x.getTitle() != null && x.getTitle().contains(filter))
+                .or(x -> x.getYear() != null && x.getYear().contains(filter))
+                .or(x -> x.getLectures() != null && x.getLectures().stream().anyMatch(y -> y.getTitle().contains(filter)));
 
         return courseRepository.findAll()
                 .stream()

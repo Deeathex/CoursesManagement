@@ -28,6 +28,9 @@ public class Utils {
     public static final String COURSE_DESCRIPTION = "Operatiuni pe fluxuri de date.";
     public static final String TPJAD = "TPJAD";
 
+    public static final String LECTURE_TITLE = "Baze de date distribuite";
+    public static final String LECTURE_TO_SAVE_TITLE = "Hibernate";
+
     public static User setUpStudent() {
         User student = new User();
 
@@ -76,6 +79,18 @@ public class Utils {
         return course;
     }
 
+    public static Course setUpCourse() {
+        Course course = new Course();
+
+        course.setId(1L);
+        course.setMaxStudents(50L);
+        course.setYear(YEAR);
+        course.setTitle(COURSE_TITLE);
+        course.setDescription(COURSE_DESCRIPTION);
+
+        return course;
+    }
+
     public static Course setUpCourseToSave() {
         Course courseToSave = new Course();
 
@@ -85,5 +100,25 @@ public class Utils {
         courseToSave.setTitle(TPJAD);
 
         return courseToSave;
+    }
+
+    public static Lecture setUpLecture() {
+        Lecture lecture = new Lecture();
+
+        lecture.setId(1L);
+        lecture.setTitle(LECTURE_TITLE);
+        lecture.setCourse(setUpCourse());
+
+        return lecture;
+    }
+
+    public static Lecture setUpLectureToSave() {
+        Lecture lecture = new Lecture();
+
+        lecture.setId(2L);
+        lecture.setTitle(LECTURE_TO_SAVE_TITLE);
+        lecture.setCourse(setUpCourseToSave());
+
+        return lecture;
     }
 }

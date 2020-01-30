@@ -86,13 +86,15 @@ public class LectureService {
         return true;
     }
 
-    public List<Lecture> filterBy(String filter) {
+    public List<Lecture> filterBy(Long courseId, String filter) {
         Predicate<Lecture> mainPredicate = x -> false;
         mainPredicate = mainPredicate
-                .or(x -> x.getTitle().contains(filter))
-                .or(x -> x.getDate().toString().contains(filter));
+                .or(x -> x.getTitle() != null && x.getTitle().contains(filter))
+                .or(x -> x.getDate() != null && x.getDate().toString().contains(filter));
 
-        return lectureRepository.findAll()
+        Course course = courseRepository.getOne(courseId);
+
+        return getAllBy(course)
                 .stream()
                 .filter(mainPredicate)
                 .collect(Collectors.toList());
