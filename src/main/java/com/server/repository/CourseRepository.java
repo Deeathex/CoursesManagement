@@ -11,5 +11,5 @@ import java.util.Optional;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
-    Optional<Collection<Course>> findAllByUsersOrderByYearDesc(List<User> professor);
+    Optional<Collection<Course>> findAllByUsersOrderByYearDesc(List<User> user);
 }

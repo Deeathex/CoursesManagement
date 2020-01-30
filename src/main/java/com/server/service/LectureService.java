@@ -24,13 +24,10 @@ public class LectureService {
 
     private final CourseRepository courseRepository;
 
-    private final UserRepository userRepository;
-
     @Autowired
-    public LectureService(LectureRepository lectureRepository, CourseRepository courseRepository, UserRepository userRepository) {
+    public LectureService(LectureRepository lectureRepository, CourseRepository courseRepository) {
         this.lectureRepository = lectureRepository;
         this.courseRepository = courseRepository;
-        this.userRepository = userRepository;
     }
 
     public List<Lecture> getAllBy(Course course) {
@@ -81,8 +78,9 @@ public class LectureService {
         }
 
         try {
-            courseRepository.deleteById(lectureId);
+            lectureRepository.deleteById(lectureId);
         } catch (IllegalArgumentException ignored) {
+            return false;
         }
 
         return true;

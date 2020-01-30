@@ -29,10 +29,20 @@ public class UserService {
         return repository.findAll();
     }
 
+    /***
+     * Returns a user from DB by his email.
+     * @param email the email to be searching for
+     * @return the User that was registered with the given mail
+     */
     public User getByEmail(String email) {
         return repository.findByEmail(email).orElse(null);
     }
 
+    /***
+     * Performs the registration on the given user.
+     * @param user to be registered
+     * @return true if the user was successfully registered or false otherwise
+     */
     public boolean register(User user) {
         if (user == null || getByEmail(user.getEmail()) != null) {
             return false;
@@ -48,6 +58,11 @@ public class UserService {
         return true;
     }
 
+    /***
+     * Returns all users with the specified role.
+     * @param role is one of PROFESSOR, STUDENT, NOT_SPECIFIED
+     * @return a list with the users from db that have the specified role
+     */
     public List<User> getAllBy(Role role) {
         return (List<User>) repository.findAllByRole(role).orElse(new ArrayList<>());
     }
@@ -62,12 +77,12 @@ public class UserService {
     }
 
     /***
-     * Validates the provided email and password such that the given email already exists in DB
-     * and the provided password matches the one from DB
+     * Checks the current email and password to see if the credentials were already registered.
+     * Checks for them not be valid.
      * @param email the supplied email
      * @param password the supplied password
-     * @return true if email is already registered and the supplied password correspond to the one from DB,
-     * false otherwise
+     * @return false if email is already registered and the supplied password correspond to the one from DB,
+     * true otherwise
      */
     public boolean isNotValid(String email, String password) {
         User userDB = getByEmail(email);

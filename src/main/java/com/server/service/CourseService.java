@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -26,24 +25,19 @@ public class CourseService {
         this.userRepository = userRepository;
     }
 
-    public List<Course> getAllBy(User user) {
-        List<User> users = new ArrayList<>();
-        users.add(user);
-        return (List<Course>) courseRepository.findAllByUsersOrderByYearDesc(users).orElse(new ArrayList<>());
-    }
-
     public List<Course> getAll() {
         return courseRepository.findAll();
     }
 
     /***
      * For My courses page
-     * @param userId the user for which to bring the courses
+     * @param user the user for which to bring the courses
      * @return all the courses for the user with the provided id.
      */
-    public List<Course> getAllBy(Long userId) {
-        User user = userRepository.getOne(userId);
-        return getAllBy(user);
+    public List<Course> getAllBy(User user) {
+        List<User> users = new ArrayList<>();
+        users.add(user);
+        return (List<Course>) courseRepository.findAllByUsersOrderByYearDesc(users).orElse(new ArrayList<>());
     }
 
     /***

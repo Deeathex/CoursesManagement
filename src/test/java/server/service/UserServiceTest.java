@@ -11,42 +11,52 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
+import static server.service.Utils.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
-    private static final String EMAIL_PROFESSOR = "profesor@cs.ubbcluj.ro";
-
-    private static final String EMAIL_STUDENT = "student@scs.ubbcluj.ro";
 
     private UserService userService;
 
     @Mock
     private UserRepository userRepository;
 
-    private List<User> inMemoryRepository = new ArrayList<>();
+    private List<User> inMemoryUserRepository = new ArrayList<>();
 
     private User professor = new User();
+
     private User student = new User();
+
     private User studentToSave = new User();
 
+    private User userNotSupported = new User();
 
     @Before
     public void init() {
         userService = new UserService(userRepository);
 
-        inMemoryRepository = mockRepository();
-        when(userRepository.findAll()).thenReturn(inMemoryRepository);
-        when(userRepository.findByEmail(EMAIL_PROFESSOR)).thenReturn(Optional.of(professor));
-        when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(Optional.of(student));
+        userNotSupported.setEmail(EMAIL_NOT_SUPPORTED);
+        student = setUpStudent();
+        professor = setUpProfessor();
 
-        setUpUserToSave();
+        inMemoryUserRepository.add(professor);
+        inMemoryUserRepository.add(student);
+
+        when(userRepository.findAll()).thenReturn(inMemoryUserRepository);
+        when(userRepository.findByEmail(PROFESSOR_EMAIL)).thenReturn(Optional.of(professor));
+        when(userRepository.findByEmail(STUDENT_EMAIL)).thenReturn(Optional.of(student));
+        when(userRepository.findAllByRole(Role.STUDENT)).thenReturn(Optional.of(Collections.singletonList(student)));
+        when(userRepository.findAllByRole(Role.PROFESSOR)).thenReturn(Optional.of(Collections.singletonList(professor)));
+
+        studentToSave = setUpUserToSave();
         when(userRepository.save(studentToSave)).thenAnswer(invocation -> {
-            inMemoryRepository.add(studentToSave);
+            inMemoryUserRepository.add(studentToSave);
             return studentToSave;
         });
     }
@@ -61,45 +71,47 @@ public class UserServiceTest {
 
     @Test
     public void getByEmailTest() {
-        assertEquals(professor, userService.getByEmail(EMAIL_PROFESSOR));
-        assertEquals(student, userService.getByEmail(EMAIL_STUDENT));
+        assertEquals(professor, userService.getByEmail(PROFESSOR_EMAIL));
+        assertEquals(student, userService.getByEmail(STUDENT_EMAIL));
         assertNull(userService.getByEmail(""));
         assertNull(userService.getByEmail(null));
     }
 
     @Test
     public void registerTest() {
-        assertEquals(2, inMemoryRepository.size());
+        assertFalse(userService.register(null));
+        assertFalse(userService.register(userNotSupported));
+
+        assertEquals(2, inMemoryUserRepository.size());
         assertTrue(userService.register(studentToSave));
-        assertEquals(3, inMemoryRepository.size());
-        assertEquals(studentToSave, inMemoryRepository.get(2));
+        assertEquals(3, inMemoryUserRepository.size());
+        assertEquals(studentToSave, inMemoryUserRepository.get(2));
 
         assertFalse(userService.register(professor));
-        assertEquals(3, inMemoryRepository.size());
+        assertEquals(3, inMemoryUserRepository.size());
 
         assertFalse(userService.register(null));
-
     }
 
-    private void setUpUserToSave() {
-        studentToSave.setEmail("casd1924@scs.ubbcluj.ro");
-        studentToSave.setPassword("password");
+    @Test
+    public void getAllByRoleTest() {
+        List<User> students = userService.getAllBy(Role.STUDENT);
+        assertEquals(1, students.size());
+        for (User student : students) {
+            assertEquals(Role.STUDENT, student.getRole());
+        }
+
+        List<User> professors = userService.getAllBy(Role.PROFESSOR);
+        assertEquals(1, professors.size());
+        for (User professor : professors) {
+            assertEquals(Role.PROFESSOR, professor.getRole());
+        }
     }
 
-    private List<User> mockRepository() {
-        professor.setRole(Role.PROFESSOR);
-        professor.setEmail(EMAIL_PROFESSOR);
-        professor.setName("Ioan");
-        professor.setSurname("Pop");
-
-        student.setRole(Role.STUDENT);
-        student.setEmail(EMAIL_STUDENT);
-        student.setName("Gigel");
-        student.setSurname("Frasinariu");
-
-        inMemoryRepository.add(professor);
-        inMemoryRepository.add(student);
-
-        return inMemoryRepository;
+    @Test
+    public void isNotValidTest() {
+        assertTrue(userService.isNotValid(EMAIL_NOT_SUPPORTED, ""));
+        assertTrue(userService.isNotValid(STUDENT_TO_SAVE_EMAIL, ""));
+        assertFalse(userService.isNotValid(STUDENT_EMAIL, PASSWORD));
     }
 }
