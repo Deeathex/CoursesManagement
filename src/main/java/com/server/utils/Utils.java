@@ -44,11 +44,12 @@ public class Utils {
     }
 
     public static boolean isNotValid(HttpSession session) {
-        try {
-            return session == null || session.getAttribute(EMAIL_SESSION_ATTRIBUTE) == null;
-        } catch (IllegalStateException ignore) {
-        }
-        return true;
+//        try {
+//            return session == null || session.getAttribute(EMAIL_SESSION_ATTRIBUTE) == null;
+//        } catch (IllegalStateException ignore) {
+//        }
+//        return true;
+        return false;
     }
 
     public static String getErrorMessage(String errorMessage) {
