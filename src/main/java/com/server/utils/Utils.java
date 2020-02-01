@@ -54,7 +54,6 @@ public class Utils {
         } catch (IllegalStateException ignore) {
         }
         return true;
-//        return false;
     }
 
     public static HttpSession getSession(String sessionId) {

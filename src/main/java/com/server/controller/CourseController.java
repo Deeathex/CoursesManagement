@@ -170,8 +170,15 @@ public class CourseController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
+        List<User> studentsFromCourse;
+        try {
+            studentsFromCourse = courseService.getStudentsFromCourse(courseId, userService.getUserFromSession(Utils.getSession(sessionId)));
+        } catch (Exception e) {
+            return new ResponseEntity<>(Utils.getErrorMessage("Incorrect course or not authorized."), HttpStatus.BAD_REQUEST);
+        }
+
         LOG.info("User requests the students enrolled to course: {}", courseId);
-        return new ResponseEntity<>(UserMapper.usersToUsersDTO(courseService.getStudentsFromCourse(courseId, userService.getUserFromSession(Utils.getSession(sessionId)))), HttpStatus.OK);
+        return new ResponseEntity<>(UserMapper.usersToUsersDTO(studentsFromCourse), HttpStatus.OK);
     }
 
     @PostMapping("/courses/email")
