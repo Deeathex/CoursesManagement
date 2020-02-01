@@ -36,8 +36,8 @@ public class CourseController {
     }
 
     @GetMapping("/courses")
-    public ResponseEntity<?> getAllCourses(HttpSession session) {
-        if (Utils.isNotValid(session)) {
+    public ResponseEntity<?> getAllCourses(@RequestHeader String sessionId) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -46,23 +46,22 @@ public class CourseController {
     }
 
     @GetMapping("/courses/my-courses")
-    public ResponseEntity<?> getAllMyCourses(
-            HttpSession session) {
+    public ResponseEntity<?> getAllMyCourses(@RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         LOG.info("User requests all his courses.");
-        return new ResponseEntity<>(CourseMapper.coursesToCoursesDTO(courseService.getAllBy(userService.getUserFromSession(session))), HttpStatus.OK);
+        return new ResponseEntity<>(CourseMapper.coursesToCoursesDTO(courseService.getAllBy(userService.getUserFromSession(Utils.getSession(sessionId)))), HttpStatus.OK);
     }
 
     @GetMapping("/courses/{course-id}")
     public ResponseEntity<?> getCourseDetailsById(
             @PathVariable("course-id") Long courseId,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -80,13 +79,13 @@ public class CourseController {
     @PostMapping("/courses/{course-id}/enroll")
     public ResponseEntity<?> enrollStudentToCourse(
             @PathVariable("course-id") Long courseId,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        if (!courseService.enrollStudent(courseId, userService.getUserFromSession(session))) {
+        if (!courseService.enrollStudent(courseId, userService.getUserFromSession(Utils.getSession(sessionId)))) {
             return new ResponseEntity<>(Utils.getErrorMessage("Incorrect course."), HttpStatus.BAD_REQUEST);
         }
 
@@ -95,8 +94,8 @@ public class CourseController {
     }
 
     @GetMapping("/courses/filter")
-    public ResponseEntity<?> filterCoursesBy(@RequestParam String filter, HttpSession session) {
-        if (Utils.isNotValid(session)) {
+    public ResponseEntity<?> filterCoursesBy(@RequestParam String filter, @RequestHeader String sessionId) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -107,16 +106,16 @@ public class CourseController {
     @PostMapping("/courses")
     public ResponseEntity<?> addOrEditCourse(
             @RequestBody CourseDTO courseDTO,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         Course course = CourseMapper.courseDTOToCourse(courseDTO);
 
         try {
-            courseService.save(course, userService.getUserFromSession(session));
+            courseService.save(course, userService.getUserFromSession(Utils.getSession(sessionId)));
         } catch (Exception e) {
             return new ResponseEntity<>(Utils.getErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -128,13 +127,13 @@ public class CourseController {
     @DeleteMapping("/courses/{course-id}")
     public ResponseEntity<?> deleteCourse(
             @PathVariable("course-id") Long courseId,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        if (!courseService.delete(courseId, userService.getUserFromSession(session))) {
+        if (!courseService.delete(courseId, userService.getUserFromSession(Utils.getSession(sessionId)))) {
             return new ResponseEntity<>(Utils.getErrorMessage("Incorrect course."), HttpStatus.BAD_REQUEST);
         }
 
@@ -145,15 +144,15 @@ public class CourseController {
     @GetMapping("/courses/{course-id}/students-number")
     public ResponseEntity<?> getNumberOfStudentsFromCourse(
             @PathVariable("course-id") Long courseId,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         int numberOfStudents;
         try {
-            numberOfStudents = courseService.getNumberOfStudentsFromCourse(courseId, userService.getUserFromSession(session));
+            numberOfStudents = courseService.getNumberOfStudentsFromCourse(courseId, userService.getUserFromSession(Utils.getSession(sessionId)));
         } catch (Exception e) {
             return new ResponseEntity<>(Utils.getErrorMessage("Incorrect course."), HttpStatus.BAD_REQUEST);
         }
@@ -165,27 +164,27 @@ public class CourseController {
     @GetMapping("/courses/{course-id}/students")
     public ResponseEntity<?> getStudentsFromCourse(
             @PathVariable("course-id") Long courseId,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         LOG.info("User requests the students enrolled to course: {}", courseId);
-        return new ResponseEntity<>(UserMapper.usersToUsersDTO(courseService.getStudentsFromCourse(courseId, userService.getUserFromSession(session))), HttpStatus.OK);
+        return new ResponseEntity<>(UserMapper.usersToUsersDTO(courseService.getStudentsFromCourse(courseId, userService.getUserFromSession(Utils.getSession(sessionId)))), HttpStatus.OK);
     }
 
     @PostMapping("/courses/email")
     public ResponseEntity<?> sendNewsToStudents(
             @RequestBody NewsDTO newsDTO,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         try {
-            List<User> studentsToBeNotified = courseService.getStudentsFromCourse(newsDTO.getCourseId(), userService.getUserFromSession(session));
+            List<User> studentsToBeNotified = courseService.getStudentsFromCourse(newsDTO.getCourseId(), userService.getUserFromSession(Utils.getSession(sessionId)));
             emailService.sendEmail(newsDTO.getNewsMessage(), studentsToBeNotified);
         } catch (Exception e) {
             return new ResponseEntity<>(Utils.getErrorMessage("Incorrect course."), HttpStatus.BAD_REQUEST);

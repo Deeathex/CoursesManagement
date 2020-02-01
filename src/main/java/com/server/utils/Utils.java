@@ -5,10 +5,14 @@ import com.server.model.enums.Role;
 import org.json.JSONObject;
 
 import javax.servlet.http.HttpSession;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Utils {
+
+    public static Map<String, HttpSession> sessionMap = new ConcurrentHashMap<>();
 
     public static final String EMAIL_SESSION_ATTRIBUTE = "email";
 
@@ -21,7 +25,6 @@ public class Utils {
     private static final String EMAIL_STUDENTS = "scs.ubbcluj.ro";
 
     private static final String MESSAGE = "message";
-
 
     public static Role getRoleByEmail(String email) {
 
@@ -43,13 +46,19 @@ public class Utils {
         return Role.NOT_SUPPORTED;
     }
 
-    public static boolean isNotValid(HttpSession session) {
-//        try {
-//            return session == null || session.getAttribute(EMAIL_SESSION_ATTRIBUTE) == null;
-//        } catch (IllegalStateException ignore) {
-//        }
-//        return true;
-        return false;
+    public static boolean isNotValid(String sessionId) {
+        HttpSession session = Utils.sessionMap.get(sessionId);
+
+        try {
+            return session == null || session.getAttribute(EMAIL_SESSION_ATTRIBUTE) == null;
+        } catch (IllegalStateException ignore) {
+        }
+        return true;
+//        return false;
+    }
+
+    public static HttpSession getSession(String sessionId) {
+        return Utils.sessionMap.get(sessionId);
     }
 
     public static String getErrorMessage(String errorMessage) {

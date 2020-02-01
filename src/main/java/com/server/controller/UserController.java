@@ -60,12 +60,15 @@ public class UserController {
 
         String json = UserMapper.getJsonMessageAsString(session, UserMapper.userToUserDTO(userService.getByEmail(email)));
 
+        Utils.sessionMap.put(session.getId(), session);
+
         LOG.info("User {} logged in.", email);
         return new ResponseEntity<>(json, HttpStatus.OK);
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
+    public ResponseEntity<?> logout(@RequestHeader String sessionId) {
+        HttpSession session = Utils.sessionMap.remove(sessionId);
         String email = (String) session.getAttribute(Utils.EMAIL_SESSION_ATTRIBUTE);
         session.removeAttribute(Utils.EMAIL_SESSION_ATTRIBUTE);
         session.invalidate();
@@ -75,8 +78,8 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers(HttpSession session) {
-        if (Utils.isNotValid(session)) {
+    public ResponseEntity<?> getAllUsers(@RequestHeader String sessionId) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -84,8 +87,8 @@ public class UserController {
     }
 
     @GetMapping("/users/{role}")
-    public ResponseEntity<?> getAllUsersByRole(@PathVariable("role") Role role, HttpSession session) {
-        if (Utils.isNotValid(session)) {
+    public ResponseEntity<?> getAllUsersByRole(@PathVariable("role") Role role, @RequestHeader String sessionId) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -96,13 +99,13 @@ public class UserController {
     public ResponseEntity<?> saveAccountSettings(
             @ModelAttribute AccountDTO accountDTO,
             @RequestParam("file") MultipartFile file,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        User user = userService.getUserFromSession(session);
+        User user = userService.getUserFromSession(Utils.getSession(sessionId));
 
         if (checkAccountDTO(accountDTO)
                 && (userService.isNotValid(user.getEmail(), accountDTO.getPassword())

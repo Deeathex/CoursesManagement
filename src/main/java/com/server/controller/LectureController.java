@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.rmi.CORBA.Util;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -33,14 +34,14 @@ public class LectureController {
     @GetMapping("/lectures/{course-id}")
     public ResponseEntity<?> getAllLecturesByCourse(
             @PathVariable("course-id") Long courseId,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         LOG.info("User requests all lectures from course: {}", courseId);
-        User user = userService.getUserFromSession(session);
+        User user = userService.getUserFromSession(Utils.getSession(sessionId));
 
         List<Lecture> lectures;
         try {
@@ -57,9 +58,9 @@ public class LectureController {
     public ResponseEntity<?> filterLecturesBy(
             @RequestParam String filter,
             @PathVariable("course-id") Long courseId,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -70,9 +71,9 @@ public class LectureController {
     @PostMapping("/lectures")
     public ResponseEntity<?> addOrEditLectureToCourse(
             @RequestBody LectureDTOWrapper lectureDTOWrapper,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -80,7 +81,7 @@ public class LectureController {
         Long courseId = lectureDTOWrapper.getCourseId();
 
         try {
-            lectureService.save(lecture, courseId, userService.getUserFromSession(session));
+            lectureService.save(lecture, courseId, userService.getUserFromSession(Utils.getSession(sessionId)));
         } catch (Exception e) {
             return new ResponseEntity<>(Utils.getErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -92,13 +93,13 @@ public class LectureController {
     @DeleteMapping("/lectures/{lecture-id}")
     public ResponseEntity<?> deleteLecture(
             @PathVariable("lecture-id") Long lectureId,
-            HttpSession session) {
+            @RequestHeader String sessionId) {
 
-        if (Utils.isNotValid(session)) {
+        if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        if (!lectureService.delete(lectureId, userService.getUserFromSession(session))) {
+        if (!lectureService.delete(lectureId, userService.getUserFromSession(Utils.getSession(sessionId)))) {
             return new ResponseEntity<>(Utils.getErrorMessage("Incorrect lecture to delete."), HttpStatus.BAD_REQUEST);
         }
 
