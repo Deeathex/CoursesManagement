@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader String sessionId) {
+    public ResponseEntity<?> logout(@RequestHeader("session-id") String sessionId) {
         HttpSession session = Utils.sessionMap.remove(sessionId);
         String email = (String) session.getAttribute(Utils.EMAIL_SESSION_ATTRIBUTE);
         session.removeAttribute(Utils.EMAIL_SESSION_ATTRIBUTE);
@@ -78,7 +78,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers(@RequestHeader String sessionId) {
+    public ResponseEntity<?> getAllUsers(@RequestHeader("session-id") String sessionId) {
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -87,7 +87,7 @@ public class UserController {
     }
 
     @GetMapping("/users/{role}")
-    public ResponseEntity<?> getAllUsersByRole(@PathVariable("role") Role role, @RequestHeader String sessionId) {
+    public ResponseEntity<?> getAllUsersByRole(@PathVariable("role") Role role, @RequestHeader("session-id") String sessionId) {
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -99,7 +99,7 @@ public class UserController {
     public ResponseEntity<?> saveAccountSettings(
             @ModelAttribute AccountDTO accountDTO,
             @RequestParam("file") MultipartFile file,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);

@@ -5,7 +5,6 @@ import com.server.model.Lecture;
 import com.server.model.User;
 import com.server.model.enums.Role;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {

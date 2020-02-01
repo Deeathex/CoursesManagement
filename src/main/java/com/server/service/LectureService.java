@@ -6,8 +6,6 @@ import com.server.model.User;
 import com.server.model.enums.Role;
 import com.server.repository.CourseRepository;
 import com.server.repository.LectureRepository;
-import com.server.repository.UserRepository;
-import com.server.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

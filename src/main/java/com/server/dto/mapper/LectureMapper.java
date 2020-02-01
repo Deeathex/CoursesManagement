@@ -41,14 +41,4 @@ public class LectureMapper {
 
         return lecturesDTO;
     }
-
-    public static List<Lecture> lecturesDTOToLectures(List<LectureDTO> lecturesDTO) {
-        List<Lecture> lectures = new ArrayList<>();
-
-        for (LectureDTO userDTO : lecturesDTO) {
-            lectures.add(lectureDTOTOLecture(userDTO));
-        }
-
-        return lectures;
-    }
 }

@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.rmi.CORBA.Util;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @CrossOrigin
@@ -34,7 +32,7 @@ public class LectureController {
     @GetMapping("/lectures/{course-id}")
     public ResponseEntity<?> getAllLecturesByCourse(
             @PathVariable("course-id") Long courseId,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -58,7 +56,7 @@ public class LectureController {
     public ResponseEntity<?> filterLecturesBy(
             @RequestParam String filter,
             @PathVariable("course-id") Long courseId,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -71,7 +69,7 @@ public class LectureController {
     @PostMapping("/lectures")
     public ResponseEntity<?> addOrEditLectureToCourse(
             @RequestBody LectureDTOWrapper lectureDTOWrapper,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -93,7 +91,7 @@ public class LectureController {
     @DeleteMapping("/lectures/{lecture-id}")
     public ResponseEntity<?> deleteLecture(
             @PathVariable("lecture-id") Long lectureId,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);

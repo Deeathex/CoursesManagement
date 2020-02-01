@@ -4,7 +4,6 @@ import com.server.model.enums.Role;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.Collection;
 

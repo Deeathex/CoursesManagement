@@ -1,6 +1,5 @@
 package com.server.dto.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -9,8 +8,6 @@ import com.server.dto.AccountDTO;
 import com.server.dto.UserDTO;
 import com.server.model.User;
 import lombok.NoArgsConstructor;
-import org.json.JSONObject;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;

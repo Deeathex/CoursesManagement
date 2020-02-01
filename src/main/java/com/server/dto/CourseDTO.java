@@ -1,8 +1,8 @@
 package com.server.dto;
 
-import com.server.model.Lecture;
-import com.server.model.User;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.ArrayList;

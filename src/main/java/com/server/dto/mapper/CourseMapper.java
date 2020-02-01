@@ -74,14 +74,4 @@ public class CourseMapper {
 
         return coursesDTO;
     }
-
-    public static List<Course> coursesDTOToCourses(List<CourseDTO> coursesDTO) {
-        List<Course> courses = new ArrayList<>();
-
-        for (CourseDTO userDTO : coursesDTO) {
-            courses.add(courseDTOToCourse(userDTO));
-        }
-
-        return courses;
-    }
 }

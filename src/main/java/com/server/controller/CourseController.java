@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @CrossOrigin
@@ -36,7 +35,7 @@ public class CourseController {
     }
 
     @GetMapping("/courses")
-    public ResponseEntity<?> getAllCourses(@RequestHeader String sessionId) {
+    public ResponseEntity<?> getAllCourses(@RequestHeader("session-id") String sessionId) {
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -46,7 +45,7 @@ public class CourseController {
     }
 
     @GetMapping("/courses/my-courses")
-    public ResponseEntity<?> getAllMyCourses(@RequestHeader String sessionId) {
+    public ResponseEntity<?> getAllMyCourses(@RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -59,7 +58,7 @@ public class CourseController {
     @GetMapping("/courses/{course-id}")
     public ResponseEntity<?> getCourseDetailsById(
             @PathVariable("course-id") Long courseId,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -79,7 +78,7 @@ public class CourseController {
     @PostMapping("/courses/{course-id}/enroll")
     public ResponseEntity<?> enrollStudentToCourse(
             @PathVariable("course-id") Long courseId,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -94,7 +93,7 @@ public class CourseController {
     }
 
     @GetMapping("/courses/filter")
-    public ResponseEntity<?> filterCoursesBy(@RequestParam String filter, @RequestHeader String sessionId) {
+    public ResponseEntity<?> filterCoursesBy(@RequestParam String filter, @RequestHeader("session-id") String sessionId) {
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -106,7 +105,7 @@ public class CourseController {
     @PostMapping("/courses")
     public ResponseEntity<?> addOrEditCourse(
             @RequestBody CourseDTO courseDTO,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -127,7 +126,7 @@ public class CourseController {
     @DeleteMapping("/courses/{course-id}")
     public ResponseEntity<?> deleteCourse(
             @PathVariable("course-id") Long courseId,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -144,7 +143,7 @@ public class CourseController {
     @GetMapping("/courses/{course-id}/students-number")
     public ResponseEntity<?> getNumberOfStudentsFromCourse(
             @PathVariable("course-id") Long courseId,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -164,7 +163,7 @@ public class CourseController {
     @GetMapping("/courses/{course-id}/students")
     public ResponseEntity<?> getStudentsFromCourse(
             @PathVariable("course-id") Long courseId,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -184,7 +183,7 @@ public class CourseController {
     @PostMapping("/courses/email")
     public ResponseEntity<?> sendNewsToStudents(
             @RequestBody NewsDTO newsDTO,
-            @RequestHeader String sessionId) {
+            @RequestHeader("session-id") String sessionId) {
 
         if (Utils.isNotValid(sessionId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
