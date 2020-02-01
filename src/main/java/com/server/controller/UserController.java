@@ -1,6 +1,5 @@
 package com.server.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.server.dto.AccountDTO;
 import com.server.dto.CredentialsDTO;
 import com.server.dto.UserDTO;
