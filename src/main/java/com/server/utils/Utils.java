@@ -2,7 +2,9 @@ package com.server.utils;
 
 import com.server.model.User;
 import com.server.model.enums.Role;
+import com.server.service.UserService;
 import org.json.JSONObject;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
@@ -86,5 +88,10 @@ public class Utils {
         }
 
         return oldUser;
+    }
+
+    public static User getUserFromHeader(UserService userService) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.getByEmail(email);
     }
 }

@@ -10,6 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Data
 public class AccountDTO implements Serializable {
+    private String email;
     private String name;
     private String surname;
     private String password;

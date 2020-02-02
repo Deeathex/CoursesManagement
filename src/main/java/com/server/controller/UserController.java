@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,76 +47,48 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @RequestBody CredentialsDTO credentialsDTO,
-            HttpSession session) {
+    public ResponseEntity<?> login() {
 
-        String email = credentialsDTO.getEmail();
-        String password = credentialsDTO.getPassword();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        String password = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
 
         if (userService.isNotValid(email, password)) {
             return new ResponseEntity<>(Utils.getErrorMessage("Incorrect email or password"), HttpStatus.UNAUTHORIZED);
         }
-        session.setAttribute(Utils.EMAIL_SESSION_ATTRIBUTE, email);
-
-        String json = UserMapper.getJsonMessageAsString(session, UserMapper.userToUserDTO(userService.getByEmail(email)));
-
-        Utils.sessionMap.put(session.getId(), session);
 
         LOG.info("User {} logged in.", email);
-        return new ResponseEntity<>(json, HttpStatus.OK);
+        return new ResponseEntity<>(UserMapper.userToUserDTO(userService.getByEmail(email)), HttpStatus.OK);
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("session-id") String sessionId) {
-        HttpSession session = Utils.sessionMap.remove(sessionId);
-        String email = (String) session.getAttribute(Utils.EMAIL_SESSION_ATTRIBUTE);
-        session.removeAttribute(Utils.EMAIL_SESSION_ATTRIBUTE);
-        session.invalidate();
-
-        LOG.info("User {} logged out.", email);
+    public ResponseEntity<?> logout() {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers(@RequestHeader("session-id") String sessionId) {
-        if (Utils.isNotValid(sessionId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
+    public ResponseEntity<?> getAllUsers() {
         return new ResponseEntity<>(UserMapper.usersToUsersDTO(userService.getAll()), HttpStatus.OK);
     }
 
     @GetMapping("/users/{role}")
-    public ResponseEntity<?> getAllUsersByRole(@PathVariable("role") Role role, @RequestHeader("session-id") String sessionId) {
-        if (Utils.isNotValid(sessionId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
+    public ResponseEntity<?> getAllUsersByRole(@PathVariable("role") Role role) {
         return new ResponseEntity<>(UserMapper.usersToUsersDTO(userService.getAllBy(role)), HttpStatus.OK);
     }
 
     @PutMapping(value = "/save-account-settings/")
     public ResponseEntity<?> saveAccountSettings(
             @ModelAttribute AccountDTO accountDTO,
-            @RequestParam("file") MultipartFile file,
-            @RequestHeader("session-id") String sessionId) {
-
-        if (Utils.isNotValid(sessionId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        User user = userService.getUserFromSession(Utils.getSession(sessionId));
+            @RequestParam("file") MultipartFile file) {
 
         if (checkAccountDTO(accountDTO)
-                && (userService.isNotValid(user.getEmail(), accountDTO.getPassword())
+                && (userService.isNotValid(accountDTO.getEmail(), accountDTO.getPassword())
                 || !accountDTO.getNewPassword().equals(accountDTO.getRewrittenPassword()))) {
             LOG.info("Passwords do not match.");
             return new ResponseEntity<>(Utils.getErrorMessage("Passwords do not match."), HttpStatus.BAD_REQUEST);
         }
 
         User newUser = UserMapper.accountDTOToUser(accountDTO);
-        newUser.setEmail(user.getEmail());
+        newUser.setEmail(accountDTO.getEmail());
         try {
             newUser.setPicture(file.getBytes());
         } catch (IOException e) {
@@ -125,7 +98,7 @@ public class UserController {
 
         userService.saveAccountSettings(newUser);
 
-        LOG.info("User {} saves changes in account settings.", user.getEmail());
+        LOG.info("User {} saves changes in account settings.", accountDTO.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

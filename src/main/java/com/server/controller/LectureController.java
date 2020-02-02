@@ -30,16 +30,10 @@ public class LectureController {
     }
 
     @GetMapping("/lectures/{course-id}")
-    public ResponseEntity<?> getAllLecturesByCourse(
-            @PathVariable("course-id") Long courseId,
-            @RequestHeader("session-id") String sessionId) {
+    public ResponseEntity<?> getAllLecturesByCourse(@PathVariable("course-id") Long courseId) {
+        User user = Utils.getUserFromHeader(userService);
 
-        if (Utils.isNotValid(sessionId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        LOG.info("User requests all lectures from course: {}", courseId);
-        User user = userService.getUserFromSession(Utils.getSession(sessionId));
+        LOG.info("User " + user.getEmail() + " requests all lectures from course: {}", courseId);
 
         List<Lecture> lectures;
         try {
@@ -53,33 +47,20 @@ public class LectureController {
     }
 
     @GetMapping("/lectures/filter/{course-id}")
-    public ResponseEntity<?> filterLecturesBy(
-            @RequestParam String filter,
-            @PathVariable("course-id") Long courseId,
-            @RequestHeader("session-id") String sessionId) {
-
-        if (Utils.isNotValid(sessionId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
+    public ResponseEntity<?> filterLecturesBy(@RequestParam String filter, @PathVariable("course-id") Long courseId) {
         return new ResponseEntity<>(LectureMapper.lecturesToLecturesDTO(lectureService.filterBy(courseId, filter)), HttpStatus.OK);
     }
 
 
     @PostMapping("/lectures")
-    public ResponseEntity<?> addOrEditLectureToCourse(
-            @RequestBody LectureDTOWrapper lectureDTOWrapper,
-            @RequestHeader("session-id") String sessionId) {
-
-        if (Utils.isNotValid(sessionId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<?> addOrEditLectureToCourse(@RequestBody LectureDTOWrapper lectureDTOWrapper) {
+        User user = Utils.getUserFromHeader(userService);
 
         Lecture lecture = LectureMapper.lectureDTOTOLecture(lectureDTOWrapper.getLectureDTO());
         Long courseId = lectureDTOWrapper.getCourseId();
 
         try {
-            lectureService.save(lecture, courseId, userService.getUserFromSession(Utils.getSession(sessionId)));
+            lectureService.save(lecture, courseId, user);
         } catch (Exception e) {
             return new ResponseEntity<>(Utils.getErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -89,15 +70,10 @@ public class LectureController {
     }
 
     @DeleteMapping("/lectures/{lecture-id}")
-    public ResponseEntity<?> deleteLecture(
-            @PathVariable("lecture-id") Long lectureId,
-            @RequestHeader("session-id") String sessionId) {
+    public ResponseEntity<?> deleteLecture(@PathVariable("lecture-id") Long lectureId) {
+        User user = Utils.getUserFromHeader(userService);
 
-        if (Utils.isNotValid(sessionId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        if (!lectureService.delete(lectureId, userService.getUserFromSession(Utils.getSession(sessionId)))) {
+        if (!lectureService.delete(lectureId, user)) {
             return new ResponseEntity<>(Utils.getErrorMessage("Incorrect lecture to delete."), HttpStatus.BAD_REQUEST);
         }
 

@@ -20,6 +20,11 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 
+    // https://mvnrepository.com/artifact/org.springframework.security/spring-security-config
+    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.0.8.RELEASE'
+    // https://mvnrepository.com/artifact/org.springframework.security/spring-security-web
+    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.0.8.RELEASE'
+
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
 
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
