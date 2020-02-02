@@ -73,7 +73,7 @@ public class UserController {
         return new ResponseEntity<>(UserMapper.usersToUsersDTO(userService.getAllBy(role)), HttpStatus.OK);
     }
 
-    @PutMapping(value = "/save-account-settings/")
+    @PutMapping(value = "/account-settings/")
     public ResponseEntity<?> saveAccountSettings(
             @ModelAttribute AccountDTO accountDTO,
             @RequestParam("file") MultipartFile file) {
@@ -93,6 +93,25 @@ public class UserController {
             LOG.info("Could not process avatar.");
             e.printStackTrace();
         }
+
+        userService.saveAccountSettings(newUser);
+
+        LOG.info("User {} saves changes in account settings.", accountDTO.getEmail());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/save-account-settings/")
+    public ResponseEntity<?> saveAccountSettings(@RequestBody AccountDTO accountDTO) {
+
+        if (checkAccountDTO(accountDTO)
+                && (userService.isNotValid(accountDTO.getEmail(), accountDTO.getPassword())
+                || !accountDTO.getNewPassword().equals(accountDTO.getRewrittenPassword()))) {
+            LOG.info("Passwords do not match.");
+            return new ResponseEntity<>(Utils.getErrorMessage("Passwords do not match."), HttpStatus.BAD_REQUEST);
+        }
+
+        User newUser = UserMapper.accountDTOToUser(accountDTO);
+        newUser.setEmail(accountDTO.getEmail());
 
         userService.saveAccountSettings(newUser);
 

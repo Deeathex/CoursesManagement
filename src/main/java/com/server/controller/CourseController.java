@@ -108,14 +108,7 @@ public class CourseController {
 
     @GetMapping("/courses/{course-id}/students-number")
     public ResponseEntity<?> getNumberOfStudentsFromCourse(@PathVariable("course-id") Long courseId) {
-        User user = Utils.getUserFromHeader(userService);
-
-        int numberOfStudents;
-        try {
-            numberOfStudents = courseService.getNumberOfStudentsFromCourse(courseId, user);
-        } catch (Exception e) {
-            return new ResponseEntity<>(Utils.getErrorMessage("Incorrect course."), HttpStatus.BAD_REQUEST);
-        }
+        int numberOfStudents = courseService.getNumberOfStudentsFromCourse(courseId);
 
         LOG.info("User requests the number of students for course: " + courseId + " - " + numberOfStudents);
         return new ResponseEntity<>(Utils.getJsonForFrontEndAsString("studentsNumber", "" + numberOfStudents), HttpStatus.OK);

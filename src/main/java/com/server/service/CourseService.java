@@ -62,7 +62,7 @@ public class CourseService {
 
         // the professor must be added too in the list of users within a course
         user.getCourses().add(course);
-        userRepository.save(user);
+        //userRepository.save(user);
 
         return courseRepository.save(course);
     }
@@ -105,11 +105,7 @@ public class CourseService {
                 .collect(Collectors.toList());
     }
 
-    public int getNumberOfStudentsFromCourse(Long courseId, User user) {
-        if (!user.getRole().equals(Role.PROFESSOR)) {
-            throw new RuntimeException("Not authorized.");
-        }
-
+    public int getNumberOfStudentsFromCourse(Long courseId) {
         Course course = courseRepository.getOne(courseId);
 
         int studentsCount = 0;
