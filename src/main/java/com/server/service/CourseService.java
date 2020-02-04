@@ -81,14 +81,19 @@ public class CourseService {
             if (!user.getRole().equals(Role.STUDENT)) {
                 return false;
             }
-            Course newCourse = courseRepository.getOne(courseId);
-            user.getCourses().add(newCourse);
-            userRepository.save(user);
 
-            return true;
+            int numberOfStudents = getNumberOfStudentsFromCourse(courseId);
+            Course newCourse = courseRepository.getOne(courseId);
+            if (numberOfStudents < newCourse.getMaxStudents()) {
+                user.getCourses().add(newCourse);
+                userRepository.save(user);
+                return true;
+            }
+
         } catch (javax.persistence.EntityNotFoundException e) {
             return false;
         }
+        return false;
     }
 
     public List<Course> filterBy(String filter) {

@@ -122,7 +122,7 @@ public class CourseServiceTest {
 
     @Test
     public void getNumberOfStudentFromCourseTest() {
-        int numberOfStudentsFromCourse = courseService.getNumberOfStudentsFromCourse(1L, professor);
+        int numberOfStudentsFromCourse = courseService.getNumberOfStudentsFromCourse(1L);
         assertEquals(0, numberOfStudentsFromCourse);
     }
 

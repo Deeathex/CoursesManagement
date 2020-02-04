@@ -5,9 +5,11 @@ import com.server.dto.NewsDTO;
 import com.server.dto.mapper.CourseMapper;
 import com.server.dto.mapper.UserMapper;
 import com.server.model.Course;
+import com.server.model.Lecture;
 import com.server.model.User;
 import com.server.service.CourseService;
 import com.server.service.EmailService;
+import com.server.service.LectureService;
 import com.server.service.UserService;
 import com.server.utils.Utils;
 import org.apache.logging.log4j.LogManager;
@@ -25,11 +27,13 @@ public class CourseController {
     private static final Logger LOG = LogManager.getLogger(CourseController.class.getName());
 
     private final CourseService courseService;
+    private final LectureService lectureService;
     private final UserService userService;
     private final EmailService emailService;
 
-    public CourseController(CourseService courseService, UserService userService) {
+    public CourseController(CourseService courseService, LectureService lectureService, UserService userService) {
         this.courseService = courseService;
+        this.lectureService = lectureService;
         this.userService = userService;
         this.emailService = new EmailService();
     }
@@ -66,7 +70,7 @@ public class CourseController {
         User user = Utils.getUserFromHeader(userService);
 
         if (!courseService.enrollStudent(courseId, user)) {
-            return new ResponseEntity<>(Utils.getErrorMessage("Incorrect course."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(Utils.getErrorMessage("Incorrect course or the course reached the maximum number of students allowed to enroll."), HttpStatus.BAD_REQUEST);
         }
 
         LOG.info("User enrolled to course with id: {}", courseId);
@@ -86,6 +90,19 @@ public class CourseController {
 
         try {
             courseService.save(course, user);
+            List<Lecture> lecturesFromCourse = (List<Lecture>) course.getLectures();
+            if (lecturesFromCourse != null && !lecturesFromCourse.isEmpty()) {
+                for (Lecture lecture : lecturesFromCourse) {
+                    lectureService.save(lecture, course.getId(), user);
+                }
+            }
+
+            List<User> usersFromLecture = (List<User>) course.getUsers();
+            if (usersFromLecture != null && !usersFromLecture.isEmpty()) {
+                for (User u : usersFromLecture) {
+                    courseService.enrollStudent(course.getId(), u);
+                }
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(Utils.getErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
