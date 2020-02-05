@@ -28,9 +28,9 @@ public class Course {
     @Column
     private Long maxStudents;
 
-    @OneToMany(mappedBy = "course", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     private Collection<Lecture> lectures = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "courses", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
     private Collection<User> users = new ArrayList<>();
 }
