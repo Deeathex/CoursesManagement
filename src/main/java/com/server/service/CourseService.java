@@ -61,8 +61,9 @@ public class CourseService {
         }
 
         // the professor must be added too in the list of users within a course
-        user.getCourses().add(course);
-        //userRepository.save(user);
+        if (course.getId() == null) {
+            user.getCourses().add(course);
+        }
 
         return courseRepository.save(course);
     }

@@ -61,7 +61,7 @@ public class CourseController {
             return new ResponseEntity<>(Utils.getErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
-        LOG.info("User wants to see details for course: {}", course);
+        LOG.info("User wants to see details for course: {}", course.getTitle());
         return new ResponseEntity<>(CourseMapper.courseToCourseDTO(course), HttpStatus.OK);
     }
 

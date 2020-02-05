@@ -31,6 +31,6 @@ public class Course {
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     private Collection<Lecture> lectures = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "courses")
+    @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
     private Collection<User> users = new ArrayList<>();
 }

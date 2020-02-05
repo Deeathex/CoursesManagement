@@ -6,16 +6,29 @@ import com.server.model.User;
 import com.server.service.CourseService;
 import com.server.service.LectureService;
 import com.server.service.UserService;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 
 @Component
 public class DatabaseInitializer implements ApplicationListener<ApplicationReadyEvent> {
     private static final String PASSWORD = "password";
+    private static final String PATH = "../../../pdf/";
+
+    private static final String filename1 = "BD_curs1.pdf";
+    private static final String filename2 = "BD_curs2.pdf";
+    private static final String filename3 = "FP_curs1.pdf";
+    private static final String filename4 = "FP_curs2.pdf";
+    private static final String filename5 = "MAC_curs1.pdf";
 
     @Autowired
     private UserService userService;
@@ -24,7 +37,7 @@ public class DatabaseInitializer implements ApplicationListener<ApplicationReady
     @Autowired
     private LectureService lectureService;
 
-    public void seedData() {
+    public void seedData() throws IOException {
         // profesori
         User professor1 = new User();
         professor1.setName("Ioan");
@@ -73,26 +86,41 @@ public class DatabaseInitializer implements ApplicationListener<ApplicationReady
         Lecture lecture1 = new Lecture();
         lecture1.setTitle("Baze de date realtionale");
         lecture1.setDate(LocalDate.of(2020, 1, 13));
+        lecture1.setFilename(filename1);
+        Path path1 = new File(getClass().getResource(PATH + filename1).getFile()).toPath();
+        lecture1.setAttachment(Files.readAllBytes(path1));
         lectureService.save(lecture1, course1.getId(), professor1);
 
         Lecture lecture2 = new Lecture();
         lecture2.setTitle("Tabele");
         lecture2.setDate(LocalDate.of(2020, 1, 20));
+        lecture2.setFilename(filename2);
+        Path path2 = new File(getClass().getResource(PATH + filename2).getFile()).toPath();
+        lecture2.setAttachment(Files.readAllBytes(path2));
         lectureService.save(lecture2, course1.getId(), professor1);
 
         Lecture lecture3 = new Lecture();
         lecture3.setTitle("Introducere in Python");
         lecture3.setDate(LocalDate.of(2019, 10, 20));
+        lecture3.setFilename(filename3);
+        Path path3 = new File(getClass().getResource(PATH + filename3).getFile()).toPath();
+        lecture3.setAttachment(Files.readAllBytes(path3));
         lectureService.save(lecture3, course2.getId(), professor2);
 
         Lecture lecture4 = new Lecture();
         lecture4.setTitle("Cautari");
         lecture4.setDate(LocalDate.of(2019, 10, 27));
+        lecture4.setFilename(filename4);
+        Path path4 = new File(getClass().getResource(PATH + filename4).getFile()).toPath();
+        lecture4.setAttachment(Files.readAllBytes(path4));
         lectureService.save(lecture4, course2.getId(), professor2);
 
         Lecture lecture5 = new Lecture();
         lecture5.setTitle("RSA");
         lecture5.setDate(LocalDate.of(2019, 10, 5));
+        lecture5.setFilename(filename5);
+        Path path5 = new File(getClass().getResource(PATH + filename5).getFile()).toPath();
+        lecture5.setAttachment(Files.readAllBytes(path5));
         lectureService.save(lecture5, course3.getId(), admin);
 
         // studenti
@@ -127,8 +155,9 @@ public class DatabaseInitializer implements ApplicationListener<ApplicationReady
         }
     }
 
+    @SneakyThrows
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        //seedData();
+//        seedData();
     }
 }
