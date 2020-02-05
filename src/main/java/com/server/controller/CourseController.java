@@ -78,6 +78,18 @@ public class CourseController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/courses/{course-id}/leave")
+    public ResponseEntity<?> leaveCourse(@PathVariable("course-id") Long courseId) {
+        User user = Utils.getUserFromHeader(userService);
+
+        if (!courseService.leaveCourseStudent(courseId, user)) {
+            return new ResponseEntity<>(Utils.getErrorMessage("Incorrect course."), HttpStatus.BAD_REQUEST);
+        }
+
+        LOG.info("User left course with id: {}", courseId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/courses/filter")
     public ResponseEntity<?> filterCoursesBy(@RequestParam String filter) {
         return new ResponseEntity<>(CourseMapper.coursesToCoursesDTO(courseService.filterBy(filter)), HttpStatus.OK);

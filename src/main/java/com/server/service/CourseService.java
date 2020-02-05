@@ -97,6 +97,22 @@ public class CourseService {
         return false;
     }
 
+    public boolean leaveCourseStudent(Long courseId, User user) {
+        try {
+            if (!user.getRole().equals(Role.STUDENT)) {
+                return false;
+            }
+
+            Course newCourse = courseRepository.getOne(courseId);
+            user.getCourses().remove(newCourse);
+            userRepository.save(user);
+            return true;
+
+        } catch (javax.persistence.EntityNotFoundException e) {
+            return false;
+        }
+    }
+
     public List<Course> filterBy(String filter) {
         Predicate<Course> mainPredicate = x -> false;
         mainPredicate = mainPredicate
