@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @CrossOrigin
@@ -91,6 +92,12 @@ public class CourseController {
         try {
             courseService.save(course, user);
             List<Lecture> lecturesFromCourse = (List<Lecture>) course.getLectures();
+
+            List<Lecture> lecturesFromDB = lectureService.getAllBy(course);
+            for (Lecture lecture : lecturesFromDB) {
+                lectureService.delete(lecture.getId(), user);
+            }
+
             if (lecturesFromCourse != null && !lecturesFromCourse.isEmpty()) {
                 for (Lecture lecture : lecturesFromCourse) {
                     lectureService.save(lecture, course.getId(), user);
