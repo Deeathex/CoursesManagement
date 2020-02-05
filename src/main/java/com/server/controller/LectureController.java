@@ -9,10 +9,16 @@ import com.server.service.UserService;
 import com.server.utils.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin
@@ -80,4 +86,40 @@ public class LectureController {
         LOG.info("Professors deletes lecture with id: {}", lectureId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping(value = "/pdf/{fileName:.+}", produces = "application/pdf")
+    public ResponseEntity<InputStreamResource> download(@PathVariable("fileName") String fileName) throws IOException {
+        ClassPathResource pdfFile = new ClassPathResource("/pdf/" + fileName);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        headers.add("Access-Control-Allow-Origin", "*");
+        headers.add("Access-Control-Allow-Methods", "GET, POST, PUT");
+        headers.add("Access-Control-Allow-Headers", "Content-Type");
+        headers.add("Content-Disposition", "filename=" + fileName);
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+
+        headers.setContentLength(pdfFile.contentLength());
+        return new ResponseEntity<>(new InputStreamResource(pdfFile.getInputStream()), headers, HttpStatus.OK);
+    }
+
+//    @GetMapping(value = "/pdf/{course-id}", produces = "application/pdf")
+//    public ResponseEntity<List<InputStreamResource>> getPdfsFromCourse(@PathVariable("course-id") Long courseId) throws IOException {
+//        List<InputStreamResource> pdfs = new ArrayList<>();
+//
+//        ClassPathResource pdfFile = new ClassPathResource("/pdf/" + fileName);
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+//        headers.add("Access-Control-Allow-Origin", "*");
+//        headers.add("Access-Control-Allow-Methods", "GET, POST, PUT");
+//        headers.add("Access-Control-Allow-Headers", "Content-Type");
+//        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+//        headers.add("Pragma", "no-cache");
+//        headers.add("Expires", "0");
+//
+//        headers.setContentLength(pdfFile.contentLength());
+//        new InputStreamResource(pdfFile.getInputStream());
+//        return new ResponseEntity<>(pdfs, headers, HttpStatus.OK);
+//    }
 }

@@ -160,5 +160,4 @@ public class CourseController {
         LOG.info("Professor notifies students enrolled to course with id: {}", newsDTO.getCourseId());
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }
